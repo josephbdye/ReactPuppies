@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css"/>
+    <title>Puppy Bowl</title>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+function App() {
+  const [players, setPlayers] = React.useState([]);
+  const [id, setId] = React.useState(window.location.hash.slice(1) * 1);
+
+  React.useEffect(() => {
+  async function fetchPlayers() {
+    try {
+      const response = await fetch('https://fsa-puppy-bowl.herokuapp.com/api/2309-ftb-et-am/players');
+      const json = await response.json();
+
+      if (json.success && json.data && Array.isArray(json.data.players)) {
+        setPlayers(json.data.players);
+      } else {
+        console.error('Invalid data structure:', json);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  fetchPlayers();
+
+  window.addEventListener('hashchange', () => {
+  setId(window.location.hash.slice(1) * 1);
+
+    });
+  }, []);
+
+  let filtered = players;
+  if (id) {
+    filtered = players.filter(function (player) {
+      return player.id === id;
+    });
+  }
+
+  return (
+    <div>
+      <h1>All Puppies {players.length}</h1>
+      <a href='#'>Show All Puppies</a>
+      <ul>
+        {filtered.map(function (player) {
+          return (
+            <li key={player.id}>
+              <a href={`#${player.id}`}>
+                {player.name}
+              </a>
+              <p>
+                {player.location}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <App />
+);  
+</script>
+</html>
