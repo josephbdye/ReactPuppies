@@ -25,7 +25,7 @@ import { createRoot } from 'react-dom/client';
 
 function App() {
   const [players, setPlayers] = React.useState([]);
-  const [id, setId] = React.useState(window.location.hash.slice(1) * 1);
+  const [id, setId] = React.useState(window.location.hash.slice(1));
 
   React.useEffect(() => {
   async function fetchPlayers() {
@@ -45,8 +45,8 @@ function App() {
 
   fetchPlayers();
 
-  window.addEventListener('hashchange', () => {
-  setId(window.location.hash.slice(1) * 1);
+  window.addEventListener('hashchange', function(){
+    setId(window.location.hash.slice(1)*1);
 
     });
   }, []);
@@ -63,15 +63,14 @@ function App() {
       <h1>All Puppies {players.length}</h1>
       <a href='#'>Show All Puppies</a>
       <ul>
-        {filtered.map(function (player) {
+        {filtered.map(function(player) {
           return (
             <li key={player.id}>
               <a href={`#${player.id}`}>
                 {player.name}
               </a>
-              <p>
-                {player.location}
-              </p>
+              {id ? <img src={player.imageUrl}></img> : null}
+              {id ? <p>{player.breed}</p> : null}
             </li>
           );
         })}
